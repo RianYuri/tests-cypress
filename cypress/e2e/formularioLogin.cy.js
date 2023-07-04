@@ -18,3 +18,4 @@ describe('Formulario de Login', ()=>{
     cy.getByData('mensagem-erro').should('exist').and('have.text', 'O campo email é obrigatório')
   })
 })
+// Caso queira executar somente um test coloco o .only depois do it
