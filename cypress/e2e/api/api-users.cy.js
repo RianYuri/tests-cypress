@@ -35,7 +35,7 @@ describe('Realizando requisicoes na api', () => {
     });
   });
 
-//   Nesse test estamos simulando como se a api tivesse rodando usando o metodo intercept que faz essa simulacao, como se fasso dados da api
+  //   Nesse test estamos simulando como se a api tivesse rodando usando o metodo intercept que faz essa simulacao, como se fasso dados da api
   context('Interceptando solicitações de rede', () => {
     it('Deve fazer a interceptação do POST users/login', () => {
       cy.intercept('POST', 'users/login').as('loginRequest');
@@ -55,6 +55,23 @@ describe('Realizando requisicoes na api', () => {
         'contain.text',
         'Bem vindo de volta!'
       );
+    });
+  });
+
+
+  context('realizando login via api', () => {
+    it('Deve permmitit o login do usuario neilton Seguins', () => {
+      cy.request({
+        method: 'POST',
+        url: 'http://localhost:8000/users/login',
+        body: Cypress.env(),
+      }).then((response)=>{
+        expect(response.status).to.eq(200)
+        expect(response.body).is.not.empty
+        // is not empty quero dizer que o corpo da minha resposta nao seja vazio
+        expect(response.body.user).to.have.property('nome')
+        expect(response.body.user.nome).to.be.equal('Neilton Seguins')
+      })
     });
   });
 });
