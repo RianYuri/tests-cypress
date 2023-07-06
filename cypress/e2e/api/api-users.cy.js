@@ -22,16 +22,39 @@ describe('Realizando requisicoes na api', () => {
         expect(response.body).to.have.property('nome');
       });
     });
-    it('Deve retornar um erro quando o usuario for invalido',()=>{
-        cy.request({
-            method: 'GET',
-            url: 'http://localhost:8000/users/40a41438-84a6-4b4d',
-            // Esse failOnStatusCode faz roda o codigo mesmo que de erro, porque como queremos verificar se vai dar erro deixamos como falso para rodar a aplicação
-            failOnStatusCode:false
-        }).then(response =>{
-            expect(response.status).to.eq(404)
-            expect(response.body).to.eq('Not Found')
-        })
-    })
+    it('Deve retornar um erro quando o usuario for invalido', () => {
+      cy.request({
+        method: 'GET',
+        url: 'http://localhost:8000/users/40a41438-84a6-4b4d',
+        // Esse failOnStatusCode faz roda o codigo mesmo que de erro, porque como queremos verificar se vai dar erro deixamos como falso para rodar a aplicação
+        failOnStatusCode: false,
+      }).then((response) => {
+        expect(response.status).to.eq(404);
+        expect(response.body).to.eq('Not Found');
+      });
+    });
+  });
+
+//   Nesse test estamos simulando como se a api tivesse rodando usando o metodo intercept que faz essa simulacao, como se fasso dados da api
+  context('Interceptando solicitações de rede', () => {
+    it('Deve fazer a interceptação do POST users/login', () => {
+      cy.intercept('POST', 'users/login').as('loginRequest');
+      cy.login('neilton@alura.com', '123456');
+      cy.wait('@loginRequest').then((interception) => {
+        interception.response = {
+          statusCode: 200,
+          body: {
+            sucess: true,
+            message: 'Login bem sucedido!',
+          },
+        };
+      });
+      cy.visit('/home');
+
+      cy.getByData('titulo-boas-vindas').should(
+        'contain.text',
+        'Bem vindo de volta!'
+      );
+    });
   });
 });
